@@ -1,0 +1,1 @@
+netctl start wireless-wpa

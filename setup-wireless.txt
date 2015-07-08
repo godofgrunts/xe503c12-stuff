@@ -1,0 +1,99 @@
+If you're not trying to connect to a hidden SSID, simply 
+use:
+
+# wifi-menu -o
+
+(That is, wifi-menu with root privilages)
+
+I didn't use this method so I'm not 100% how to set this 
+up.
+
+If you are using an hidden ssid or just want to set it up 
+the way I did go ahead and use:
+
+# wifi-menu -o
+
+And cancel out. This setups the profiles for netctl.
+
+Navigate to /etc/netctl/examples
+
+# cd /etc/netctl/examples
+
+View them and decide what you need. The Samsung Chromebook 
+2 only has wifi so you're probably going to need either 
+wireless-open, wireless-wep, or wireless-wpa.
+
+# ls
+
+bonding          mobile_ppp   wireless-open
+bridge           openvswitch  wireless-wep
+ethernet-custom  pppoe        wireless-wpa
+ethernet-dhcp    tunnel       wireless-wpa-config
+ethernet-static  tuntap       wireless-wpa-configsection
+macvlan-dhcp     vlan-dhcp    wireless-wpa-static
+macvlan-static   vlan-static
+
+In my case, I'm using a wpa encrypted wireless router (You 
+should too!) So I copied wireless-wpa into /etc/netctl
+
+# cp /etc/netctl/examples/wireless-wpa /etc/netctl
+
+Now we're going to change directories to our new copy.
+
+# cd /etc/netctl
+
+And edit our config
+
+# nano ./wireless-wpa
+
+Things to note:
+
+Security=wpa works for wpa2. DO NOT CHANGE IT
+
+ESSID='MyNetwork'
+
+This is what you change to your network SSID name.
+
+Key='WirelessKey'
+
+This is where you put your password
+
+#Hidden=yes
+
+If your SSID is hidden (like mine) uncomment this by 
+removing the "#" so it just looks like
+
+Hidden=yes
+
+After you're done, press ctrl+o to save and ctrl+x to exit. 
+If you get an error it's because you didn't open it as 
+root.
+
+Now let's test out our new profile by doing:
+
+$ netctl start wireless-wpa
+
+This might prompt for you password if you're not root.
+
+I'd use pacman to test the connection.
+
+# pacman -Syy
+
+If everything works let's set it up so we connect on start 
+up.
+
+# netctl enable wireless-wpa
+
+Now, when you start up you should automatically connect if 
+you're within range of your wireless.
+
+If you plan on using something else to manage your 
+wireless, don't do the enable part and just use netctl 
+start as a temporary fix.
+
+If you do plan on using this method as your connection, 
+copy my "start-wireless.sh" some where you'll remember (or 
+in /usr/bin) just incase something fails during boot up.
+
+Remember to edit start-wireless.sh to use your profile name 
+if you aren't using wireless-wpa.
